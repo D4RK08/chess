@@ -1,0 +1,46 @@
+body{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #555555;
+}
+
+.caselle{
+    width:80px;
+    height:80px;
+    flex-grow: 1;
+}
+
+.righe {
+  display: flex;
+  flex-wrap: nowrap;
+}
+
+.chiaro {
+  background-color: #b16565;
+}
+
+.scuro {
+  background-color: #481b1b;
+}
+
+#scacchiera{
+    display: block;
+    flex-wrap: wrap;
+    border:5px solid #000000;
+}
+
+.pezzi {
+  display:flex;
+  align-content: center;
+  justify-content: center;
+  font-size:40px;
+}
+
+.b{
+  color:#ffffff;
+}
+
+.n{
+  color: #000000;
+}
