@@ -13,6 +13,7 @@
     var mossibianchi = [false,false,false];
     var mossineri = [false,false,false];
     var mossescacco = [];
+    var enpassant = [];
     
     [...caselle].forEach(casella => {
       casella.addEventListener("click", function (e) {
@@ -46,15 +47,20 @@
             }
             if(pedone){
               if((this.id)[1]==concesse[0][1] && this.innerHTML!="" && concesse.length >1){
-                  console.log(concesse)
-                  console.log(this.id)
-                continua = false;
-              }
-              if(((this.id==concesse[concesse.length-1] || this.id==concesse[concesse.length-2]) && concesse.length != 1) && this.innerHTML==""){
                 continua = false;
               }
               if(this.classList.contains(current)){
                 continua = false;
+              }
+              if(vecchia_casella.id[0]==parseInt(this.id[0])+(current=="n"?-2:2)){
+                controllapedone(current,this.id[0],this.id[1])
+              }
+              if(enpassant.length>0 && this.id==enpassant[1]){
+                var pedonepreso = document.getElementById((parseInt(this.id[0])+(current=="n"?-1:1))+this.id[1])
+                pedonepreso.innerHTML = ""
+                pedonepreso.classList.remove("pezzi")
+                pedonepreso.classList.remove("n");
+                pedonepreso.classList.remove("b");
               }
             }else if(king){
               if(scacconero||scaccobianco){
@@ -191,15 +197,16 @@ function mostramosse(){
           
             if(pedone){
                 if((cella.id)[1]==concesse[0][1] && cella.innerHTML!="" && concesse.length >1){
-              
+                    console.log("195")
                     cella.style.backgroundColor = "";
                 }
-                else if(((cella.id==concesse[concesse.length-1] || cella.id==concesse[concesse.length-2]) && concesse.length != 1) && cella.innerHTML==""){
-                    cella.style.backgroundColor = "";
-                }else if(cella.classList.contains(current)){
+                else if(cella.classList.contains(current)){
                     cella.style.backgroundColor = "";
                 }else if(king && mossescacco.includes(cella.id)){
                     cella.style.backgroundColor = "";
+                  
+                }else if(enpassant.length>0 && cella.id == enpassant[1]){
+                    cella.style.backgroundColor = "red";
                   
                 }else{
                     if(cella.innerHTML == ""){
@@ -231,7 +238,7 @@ function mostramosse(){
         }
       }
       
-    }
+}
     
 function nascondimosse(){
     for(let celle in concesse){
@@ -247,42 +254,57 @@ function nascondimosse(){
 function calcolaconcesse(tipo,riga,colonna){
     if(tipo=="P"){
         if(current=="n" && riga==1){
+          if(document.getElementById((parseInt(riga)+2)+colonna).innerHTML==""){
             concesse = [parseInt(riga)+1+colonna, parseInt(riga)+2+colonna];
+            
+          }
         }else if(current=="b" && riga==6){
+          if(document.getElementById((parseInt(riga)-2)+colonna).innerHTML==""){
             concesse = [parseInt(riga)-1+colonna, parseInt(riga)-2+colonna];
-              
+          }
         }else if(document.getElementById(((current=="n") ? parseInt(riga)+1 : parseInt(riga)-1)+""+colonna).innerHTML==""){
             var nuovariga = (current=="n") ? parseInt(riga)+1 : parseInt(riga)-1;
             concesse = [nuovariga+""+colonna];
         }
-        concesse.push(((current=="n") ? parseInt(riga)+1 : parseInt(riga)-1)+""+(parseInt(colonna)+1));
-        concesse.push(((current=="n") ? parseInt(riga)+1 : parseInt(riga)-1)+""+(parseInt(colonna)-1));
+        if(parseInt(colonna)+1<8){
+          if(document.getElementById(((current=="n") ? parseInt(riga)+1 : parseInt(riga)-1)+""+(parseInt(colonna)+1)).innerHTML!=""){
+            concesse.push(((current=="n") ? parseInt(riga)+1 : parseInt(riga)-1)+""+(parseInt(colonna)+1));
+          }
+        }
+        if(parseInt(colonna)-1>=0){
+          if(document.getElementById(((current=="n") ? parseInt(riga)+1 : parseInt(riga)-1)+""+(parseInt(colonna)-1)).innerHTML!=""){
+            concesse.push(((current=="n") ? parseInt(riga)+1 : parseInt(riga)-1)+""+(parseInt(colonna)-1));
+          } 
+        }
+        if(enpassant.length>0 && enpassant[0][0] == riga && enpassant[0][1] == colonna){
+          concesse.push(enpassant[1])
+        }
         pedone = true;
     }else if(tipo=="T"){
         var id = "vuoto";
         var cont = parseInt(riga)
-        while(cont<8 && cont>=0 && document.getElementById(id).innerHTML==""){
+        while(cont<8 && cont>=0 && (document.getElementById(id).innerHTML=="" || document.getElementById(id).innerHTML=="K")){
               cont++;
               id = cont+colonna;
               concesse.push(id);
             }
             id = "vuoto";
             cont = parseInt(colonna)
-            while(cont<8 && cont>=0 && document.getElementById(id).innerHTML==""){
+            while(cont<8 && cont>=0 && (document.getElementById(id).innerHTML=="" || document.getElementById(id).innerHTML=="K")){
               cont++;
               id = riga+cont;
               concesse.push(id);
             }
             id = "vuoto";
             cont = parseInt(riga)
-            while(cont<8 && cont>=0 && document.getElementById(id).innerHTML==""){
+            while(cont<8 && cont>=0 && (document.getElementById(id).innerHTML=="" || document.getElementById(id).innerHTML=="K")){
               cont--;
               id = cont+colonna;
               concesse.push(id);
             }
             id = "vuoto";
             cont = parseInt(colonna)
-            while(cont<8 && cont>=0 && document.getElementById(id).innerHTML==""){
+            while(cont<8 && cont>=0 && (document.getElementById(id).innerHTML=="" || document.getElementById(id).innerHTML=="K")){
               cont--;
               id = riga+cont;
               concesse.push(id);
@@ -291,7 +313,7 @@ function calcolaconcesse(tipo,riga,colonna){
             var id = "vuoto";
             var contr = parseInt(riga);
             var contc = parseInt(colonna);
-            while(contc<8 && contc>=0 && contr<8 && contr>=0 && document.getElementById(id).innerHTML==""){
+            while(contc<8 && contc>=0 && contr<8 && contr>=0 && (document.getElementById(id).innerHTML=="" || document.getElementById(id).innerHTML=="K")){
               contr++;
               contc++;
               id = contr+""+contc;
@@ -300,7 +322,7 @@ function calcolaconcesse(tipo,riga,colonna){
             id = "vuoto";
             contr = parseInt(riga);
             contc = parseInt(colonna);
-            while(contc<8 && contc>=0 && contr<8 && contr>=0 && document.getElementById(id).innerHTML==""){
+            while(contc<8 && contc>=0 && contr<8 && contr>=0 && (document.getElementById(id).innerHTML=="" || document.getElementById(id).innerHTML=="K")){
               contr--;
               contc--;
               id = contr+""+contc;
@@ -309,7 +331,7 @@ function calcolaconcesse(tipo,riga,colonna){
             id = "vuoto";
             contr = parseInt(riga);
             contc = parseInt(colonna);
-            while(contc<8 && contc>=0 && contr<8 && contr>=0 && document.getElementById(id).innerHTML==""){
+            while(contc<8 && contc>=0 && contr<8 && contr>=0 && (document.getElementById(id).innerHTML=="" || document.getElementById(id).innerHTML=="K")){
               contr++;
               contc--;
               id = contr+""+contc;
@@ -318,7 +340,7 @@ function calcolaconcesse(tipo,riga,colonna){
             id = "vuoto";
             contr = parseInt(riga);
             contc = parseInt(colonna);
-            while(contc<8 && contc>=0 && contr<8 && contr>=0 && document.getElementById(id).innerHTML==""){
+            while(contc<8 && contc>=0 && contr<8 && contr>=0 && (document.getElementById(id).innerHTML=="" || document.getElementById(id).innerHTML=="K")){
               contr--;
               contc++;
               id = contr+""+contc;
@@ -340,28 +362,28 @@ function calcolaconcesse(tipo,riga,colonna){
           }else if(tipo=="Q"){
             var id = "vuoto";
             var cont = parseInt(riga)
-            while(cont<8 && cont>=0 && document.getElementById(id).innerHTML==""){
+            while(cont<8 && cont>=0 && (document.getElementById(id).innerHTML=="" || document.getElementById(id).innerHTML=="K")){
               cont++;
               id = cont+colonna;
               concesse.push(id);
             }
             id = "vuoto";
             cont = parseInt(colonna)
-            while(cont<8 && cont>=0 && document.getElementById(id).innerHTML==""){
+            while(cont<8 && cont>=0 && (document.getElementById(id).innerHTML=="" || document.getElementById(id).innerHTML=="K")){
               cont++;
               id = riga+cont;
               concesse.push(id);
             }
             id = "vuoto";
             cont = parseInt(riga)
-            while(cont<8 && cont>=0 && document.getElementById(id).innerHTML==""){
+            while(cont<8 && cont>=0 && (document.getElementById(id).innerHTML=="" || document.getElementById(id).innerHTML=="K")){
               cont--;
               id = cont+colonna;
               concesse.push(id);
             }
             id = "vuoto";
             cont = parseInt(colonna)
-            while(cont<8 && cont>=0 && document.getElementById(id).innerHTML==""){
+            while(cont<8 && cont>=0 && (document.getElementById(id).innerHTML=="" || document.getElementById(id).innerHTML=="K")){
               cont--;
               id = riga+cont;
               concesse.push(id);
@@ -370,7 +392,7 @@ function calcolaconcesse(tipo,riga,colonna){
             id = "vuoto";
             contr = parseInt(riga);
             contc = parseInt(colonna);
-            while(contc<8 && contc>=0 && contr<8 && contr>=0 && document.getElementById(id).innerHTML==""){
+            while(contc<8 && contc>=0 && contr<8 && contr>=0 && (document.getElementById(id).innerHTML=="" || document.getElementById(id).innerHTML=="K")){
               contr++;
               contc++;
               id = contr+""+contc;
@@ -379,7 +401,7 @@ function calcolaconcesse(tipo,riga,colonna){
             id = "vuoto";
             contr = parseInt(riga);
             contc = parseInt(colonna);
-            while(contc<8 && contc>=0 && contr<8 && contr>=0 && document.getElementById(id).innerHTML==""){
+            while(contc<8 && contc>=0 && contr<8 && contr>=0 && (document.getElementById(id).innerHTML=="" || document.getElementById(id).innerHTML=="K")){
               contr--;
               contc--;
               id = contr+""+contc;
@@ -388,7 +410,7 @@ function calcolaconcesse(tipo,riga,colonna){
             id = "vuoto";
             contr = parseInt(riga);
             contc = parseInt(colonna);
-            while(contc<8 && contc>=0 && contr<8 && contr>=0 && document.getElementById(id).innerHTML==""){
+            while(contc<8 && contc>=0 && contr<8 && contr>=0 && (document.getElementById(id).innerHTML=="" || document.getElementById(id).innerHTML=="K")){
               contr++;
               contc--;
               id = contr+""+contc;
@@ -397,7 +419,7 @@ function calcolaconcesse(tipo,riga,colonna){
             id = "vuoto";
             contr = parseInt(riga);
             contc = parseInt(colonna);
-            while(contc<8 && contc>=0 && contr<8 && contr>=0 && document.getElementById(id).innerHTML==""){
+            while(contc<8 && contc>=0 && contr<8 && contr>=0 && (document.getElementById(id).innerHTML=="" || document.getElementById(id).innerHTML=="K")){
               contr--;
               contc++;
               id = contr+""+contc;
@@ -465,9 +487,22 @@ function calcolaconcesse(tipo,riga,colonna){
             }
           }
           }
-    }
+          var tipotemp = document.getElementById(riga+colonna).innerHTML
+          document.getElementById(riga+colonna).innerHTML=""
+          calcolamossescacco(current,(current=="n"?renero[0]:rebianco[0]),(current=="n"?renero[1]:rebianco[1]))
+          if(mossescacco.length>1){
+            let temp=[]
+            for(let i=0;i<concesse.length;i++){
+              if(tipo=="K"?(!mossescacco.includes(concesse[i])):mossescacco.includes(concesse[i])){
+                temp.push(concesse[i])
+              }
+            }
+            concesse = temp
+          }
+          document.getElementById(riga+colonna).innerHTML=tipotemp
+}
 
-    function calcolamossescacco(player,riga,colonna){
+function calcolamossescacco(player,riga,colonna){
             mossescacco=[]
             var id = "vuoto"
             if((parseInt(riga)+1)<8&&(parseInt(colonna)+1)<8){
@@ -497,7 +532,7 @@ function calcolaconcesse(tipo,riga,colonna){
             let temp=[]
             id = "vuoto";
             var cont = parseInt(riga)
-            while(cont<7 && cont>=0 && document.getElementById(id).innerHTML==""){
+            while(cont<7 && cont>=0 && (document.getElementById(id).innerHTML=="" || document.getElementById(id).innerHTML=="K")){
               cont++;
               id = cont+colonna;
               temp.push(id);
@@ -508,7 +543,7 @@ function calcolaconcesse(tipo,riga,colonna){
             temp=[]
             id = "vuoto";
             cont = parseInt(colonna)
-            while(cont<7 && cont>=0 && document.getElementById(id).innerHTML==""){
+            while(cont<7 && cont>=0 && (document.getElementById(id).innerHTML=="" || document.getElementById(id).innerHTML=="K")){
               cont++;
               id = riga+cont;
               temp.push(id);
@@ -519,7 +554,7 @@ function calcolaconcesse(tipo,riga,colonna){
             temp=[]
             id = "vuoto";
             cont = parseInt(riga)
-            while(cont<7 && cont>0 && document.getElementById(id).innerHTML==""){
+            while(cont<7 && cont>0 && (document.getElementById(id).innerHTML=="" || document.getElementById(id).innerHTML=="K")){
               cont--;
               id = cont+colonna;
               temp.push(id);
@@ -530,7 +565,7 @@ function calcolaconcesse(tipo,riga,colonna){
             temp=[]
             id = "vuoto";
             cont = parseInt(colonna)
-            while(cont<7 && cont>0 && document.getElementById(id).innerHTML==""){
+            while(cont<7 && cont>0 && (document.getElementById(id).innerHTML=="" || document.getElementById(id).innerHTML=="K")){
               cont--;
               id = riga+cont;
               temp.push(id);
@@ -543,7 +578,7 @@ function calcolaconcesse(tipo,riga,colonna){
             id = "vuoto";
             contr = parseInt(riga);
             contc = parseInt(colonna);
-            while(contc<7 && contc>=0 && contr<7 && contr>=0 && document.getElementById(id).innerHTML==""){
+            while(contc<7 && contc>=0 && contr<7 && contr>=0 && (document.getElementById(id).innerHTML=="" || document.getElementById(id).innerHTML=="K")){
               contr++;
               contc++;
               id = contr+""+contc;
@@ -557,7 +592,7 @@ function calcolaconcesse(tipo,riga,colonna){
             contr = parseInt(riga);
             contc = parseInt(colonna);
             
-            while(contc<8 && contc>0 && contr<8 && contr>0 && document.getElementById(id).innerHTML==""){
+            while(contc<8 && contc>0 && contr<8 && contr>0 && (document.getElementById(id).innerHTML=="" || document.getElementById(id).innerHTML=="K")){
               contr--;
               contc--;
               id = contr+""+contc;
@@ -570,7 +605,7 @@ function calcolaconcesse(tipo,riga,colonna){
             id = "vuoto";
             contr = parseInt(riga);
             contc = parseInt(colonna);
-            while(contc<8 && contc>0 && contr<7 && contr>=0 && document.getElementById(id).innerHTML==""){
+            while(contc<8 && contc>0 && contr<7 && contr>=0 && (document.getElementById(id).innerHTML=="" || document.getElementById(id).innerHTML=="K")){
               contr++;
               contc--;
               id = contr+""+contc;
@@ -583,7 +618,7 @@ function calcolaconcesse(tipo,riga,colonna){
             id = "vuoto";
             contr = parseInt(riga);
             contc = parseInt(colonna);
-            while(contc<7 && contc>0 && contr<7 && contr>0 && document.getElementById(id).innerHTML==""){
+            while(contc<7 && contc>0 && contr<7 && contr>0 && (document.getElementById(id).innerHTML=="" || document.getElementById(id).innerHTML=="K")){
               contr--;
               contc++;
               id = contr+""+contc;
@@ -593,7 +628,8 @@ function calcolaconcesse(tipo,riga,colonna){
               mossescacco.push.apply(mossescacco, temp);
             }
             
-    }
+}
+
 function isscacco(player,riga,colonna){
     if(riga>7||riga<0||colonna<0||colonna>7){
         return false
@@ -659,7 +695,7 @@ function isscacco(player,riga,colonna){
             let temp=[]
             id = "vuoto";
             var cont = parseInt(riga)
-            while(cont<7 && cont>=0 && document.getElementById(id).innerHTML==""){
+            while(cont<7 && cont>=0 && (document.getElementById(id).innerHTML=="" || document.getElementById(id).innerHTML=="K")){
               cont++;
               id = cont+colonna;
               temp.push(id);
@@ -670,7 +706,7 @@ function isscacco(player,riga,colonna){
             temp=[]
             id = "vuoto";
             cont = parseInt(colonna)
-            while(cont<7 && cont>=0 && document.getElementById(id).innerHTML==""){
+            while(cont<7 && cont>=0 && (document.getElementById(id).innerHTML=="" || document.getElementById(id).innerHTML=="K")){
               cont++;
               id = riga+cont;
               temp.push(id);
@@ -681,7 +717,7 @@ function isscacco(player,riga,colonna){
             temp=[]
             id = "vuoto";
             cont = parseInt(riga)
-            while(cont<7 && cont>0 && document.getElementById(id).innerHTML==""){
+            while(cont<7 && cont>0 && (document.getElementById(id).innerHTML=="" || document.getElementById(id).innerHTML=="K")){
               cont--;
               id = cont+colonna;
               temp.push(id);
@@ -692,7 +728,7 @@ function isscacco(player,riga,colonna){
             temp=[]
             id = "vuoto";
             cont = parseInt(colonna)
-            while(cont<7 && cont>0 && document.getElementById(id).innerHTML==""){
+            while(cont<7 && cont>0 && (document.getElementById(id).innerHTML=="" || document.getElementById(id).innerHTML=="K")){
               cont--;
               id = riga+cont;
               temp.push(id);
@@ -705,7 +741,7 @@ function isscacco(player,riga,colonna){
             id = "vuoto";
             contr = parseInt(riga);
             contc = parseInt(colonna);
-            while(contc<7 && contc>=0 && contr<7 && contr>=0 && document.getElementById(id).innerHTML==""){
+            while(contc<7 && contc>=0 && contr<7 && contr>=0 && (document.getElementById(id).innerHTML=="" || document.getElementById(id).innerHTML=="K")){
               contr++;
               contc++;
               id = contr+""+contc;
@@ -719,7 +755,7 @@ function isscacco(player,riga,colonna){
             contr = parseInt(riga);
             contc = parseInt(colonna);
             
-            while(contc<8 && contc>0 && contr<8 && contr>0 && document.getElementById(id).innerHTML==""){
+            while(contc<8 && contc>0 && contr<8 && contr>0 && (document.getElementById(id).innerHTML=="" || document.getElementById(id).innerHTML=="K")){
               contr--;
               contc--;
               id = contr+""+contc;
@@ -732,7 +768,7 @@ function isscacco(player,riga,colonna){
             id = "vuoto";
             contr = parseInt(riga);
             contc = parseInt(colonna);
-            while(contc<8 && contc>0 && contr<7 && contr>=0 && document.getElementById(id).innerHTML==""){
+            while(contc<8 && contc>0 && contr<7 && contr>=0 && (document.getElementById(id).innerHTML=="" || document.getElementById(id).innerHTML=="K")){
               contr++;
               contc--;
               id = contr+""+contc;
@@ -745,7 +781,7 @@ function isscacco(player,riga,colonna){
             id = "vuoto";
             contr = parseInt(riga);
             contc = parseInt(colonna);
-            while(contc<7 && contc>0 && contr<7 && contr>0 && document.getElementById(id).innerHTML==""){
+            while(contc<7 && contc>0 && contr<7 && contr>0 && (document.getElementById(id).innerHTML=="" || document.getElementById(id).innerHTML=="K")){
               contr--;
               contc++;
               id = contr+""+contc;
@@ -758,4 +794,20 @@ function isscacco(player,riga,colonna){
 }
         
     
+function controllapedone(player,riga,colonna){
+  enpassant=[]
+  colonna=parseInt(colonna)
+  if(colonna+1<8 ){
+    if(document.getElementById(riga+(colonna+1)).innerHTML=="P" && !document.getElementById(riga+(colonna+1)).classList.contains(player)){
+      enpassant=[riga+(colonna-1),(parseInt(riga)+(player=="n"?-1:1))+""+colonna]
+    }
+      
+  }
+  if(colonna-1>=0){
+    if(document.getElementById(riga+(colonna-1)).innerHTML=="P"){
+      enpassant=[riga+(colonna-1),(parseInt(riga)+(player=="n"?-1:1))+""+colonna]
+    }
+  }
   
+
+}  
