@@ -157,9 +157,15 @@
           
           if(scaccobianco){
             calcolamossescacco("b",rebianco[0],rebianco[1])
+            if(concesse.length==0){
+                console.log("nero vince")
+            }
           }
-          if(scacconero){
-            calcolamossescacco("n",renero[0],renero[1])
+            if(scacconero){
+                calcolamossescacco("n",renero[0],renero[1])
+                if(concesse.length==0){
+                    console.log("bianco vince")
+                }
           }
               if(current=="n"){
                 if(concesse.includes(rebianco)){
