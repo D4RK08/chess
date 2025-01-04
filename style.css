@@ -1,3 +1,8 @@
+:root{
+  --popup-width: 300px;
+  --popup-height: 200px;
+}
+
 body{
   display: flex;
   justify-content: center;
@@ -27,7 +32,6 @@ body{
 #scacchiera{
     display: block;
     flex-wrap: wrap;
-    border:5px solid #000000;
 }
 
 .pezzi {
@@ -43,4 +47,47 @@ body{
 
 .n{
   color: #000000;
+}
+
+.lettere, .numeri{
+  display:flex;
+  align-content: center;
+  justify-content: center;
+  color: #00bf00;
+}
+
+.lettere{
+    width:80px;
+  
+}
+.numeri{
+    height:80px;
+}
+
+#cont-lettere{
+  display:flex;
+}
+
+#popup{
+  display: none;
+  position: fixed;
+  z-index: 1;
+  top: 10px;
+  left:10px;
+  width: var(--popup-width); 
+  height: var(--popup-height); 
+  left: calc(50% - calc(var(--popup-width) / 2));
+  top: calc(40% - calc(var(--popup-height) / 2));
+  color: white;
+  border-radius: 16px;
+  background-color: green;
+  
+}
+
+#vincita{
+  display: none;
+}
+
+#patta{
+  display:none;
 }

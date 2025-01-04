@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+  <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+    <div id="scacchiera">
+    </div>
+  <div id="vuoto"></div>  
+  <div id="popup">
+    <div id="vincita">Ha vinto il <span id="vincitore"></span> per <span id="causa"></span></div>
+    <div id="patta">Patta per <span id="causa"></span></div>
+  
+  
+  
+  
+  
+  
+  
+  </div>
+  <script>
+    const letter = ["a","b","c","d","e","f","g","h"]
+    let tipo = "";
+    let nero = Boolean(false);
+    const scacchiera = document.getElementById("scacchiera");
+  
+    for(var i=0;i<8;i++){
+      var riga = document.createElement("div");
+      riga.classList.add("righe");
+      for(var j=0;j<8;j++){
+        let square = document.createElement("div");
+        square.id = i+""+j;
+        if(nero){
+          square.classList.add("scuro");
+        }else{
+          square.classList.add("chiaro");
+        }
+        square.classList.add("caselle");
+        nero = Boolean(!nero);
+        riga.append(square);
+        if(i<2||i>5){
+          tipo = ""
+          if(i==1||i==6){
+            tipo = "P"
+          }else{
+            if(j==0||j==7){
+              tipo = "T"
+            }
+            else if(j==1||j==6){
+              tipo = "H"
+            }
+            else if(j==2||j==5){
+              tipo = "J"
+            }
+            else if(j==3){
+              tipo = "Q"
+            }else{
+              tipo = "K"
+            }
+          }
+          square.innerHTML = tipo;
+          square.classList.add("pezzi");
+          if(i<2){
+            square.classList.add("n");
+          }else{
+            square.classList.add("b");
+          }
+        }
+        
+      }
+      let numero = document.createElement("div")
+      numero.innerHTML = i
+      numero.classList.add("numeri")
+      riga.append(numero)
+      nero = Boolean(!nero);
+      scacchiera.append(riga);
+    }
+    var riga = document.createElement("div");
+    riga.id = "cont-lettere"
+    for(var i=0;i<8;i++){
+      
+      let lettera = document.createElement("div")
+      lettera.innerHTML = i
+      lettera.classList.add("lettere")
+      riga.append(lettera)
+      
+    }
+    scacchiera.append(riga);
+  </script>
+  <script src="script.js">
+  </script>
+</body>
+</html>
